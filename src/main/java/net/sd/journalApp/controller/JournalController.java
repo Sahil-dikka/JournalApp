@@ -3,6 +3,9 @@ package net.sd.journalApp.controller;
 import net.sd.journalApp.entity.JournalEntity;
 import net.sd.journalApp.service.JournalEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -30,8 +33,15 @@ public class JournalController {
     }
 
     @GetMapping("id/{myid}")
-    public Optional<JournalEntity> GetById(@PathVariable String myid){
-        return Optional.ofNullable(journalEntryService.getByIDEntry(myid).orElse(null));
+    public ResponseEntity<JournalEntity> GetById(@PathVariable String myid){
+        Optional<JournalEntity> JE =  journalEntryService.getByIDEntry(myid);
+
+        if(JE.isPresent()){
+            return new ResponseEntity<JournalEntity>(JE.get(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<JournalEntity>(HttpStatus.NOT_FOUND);
+
     }
 
     @DeleteMapping("id/{myid}")
