@@ -1,6 +1,7 @@
 package net.sd.journalApp.service;
 
 import net.sd.journalApp.entity.JournalEntity;
+import net.sd.journalApp.entity.User;
 import net.sd.journalApp.repository.JournalEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,12 +15,22 @@ public class JournalEntryService {
     @Autowired
     private JournalEntryRepository journalEntryRepository;
 
+    @Autowired
+    private UserService userService;
 
-    public JournalEntity saveEntry(JournalEntity entry) {
-        return journalEntryRepository.save(entry); // expects JournalEntity, not Optional
+    public void saveEntry(JournalEntity entry, String userName) {
+        User user = userService.findByUserName(userName);
+
+        JournalEntity saved = journalEntryRepository.save(entry);
+        user.getJournalEntries().add(saved);
+
+        userService.saveEntry(user);
     }
 
+    public void saveEntry(JournalEntity entry) {
 
+        journalEntryRepository.save(entry);
+    }
     public List<JournalEntity> getEntry(){
         return journalEntryRepository.findAll();
     }
@@ -28,9 +39,12 @@ public class JournalEntryService {
         return  journalEntryRepository.findById(id);
     }
 
-    public JournalEntity deleteEntry(String id){
-         journalEntryRepository.deleteById(id);
-        return null;
+    public void deleteEntry(String id, String userName){
+        User user = userService.findByUserName(userName);
+         user.getJournalEntries().removeIf(x -> x.getId().equals(id));
+         userService.saveEntry(user);
+        journalEntryRepository.deleteById(id);
+
     }
 
     public void updateEntry(String id){
