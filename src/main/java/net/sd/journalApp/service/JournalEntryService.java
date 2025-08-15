@@ -5,6 +5,7 @@ import net.sd.journalApp.entity.User;
 import net.sd.journalApp.repository.JournalEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ public class JournalEntryService {
     @Autowired
     private UserService userService;
 
+    @Transactional
     public void saveEntry(JournalEntity entry, String userName) {
         User user = userService.findByUserName(userName);
 
