@@ -48,6 +48,8 @@ public class SpringSecurity  {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/journal/**").authenticated()
                         .requestMatchers("/user", "/user/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

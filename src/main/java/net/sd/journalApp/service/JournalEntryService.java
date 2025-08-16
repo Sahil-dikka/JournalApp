@@ -5,7 +5,6 @@ import net.sd.journalApp.entity.User;
 import net.sd.journalApp.repository.JournalEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,14 +18,14 @@ public class JournalEntryService {
     @Autowired
     private UserService userService;
 
-    @Transactional
+//    @Transactional
     public void saveEntry(JournalEntity entry, String userName) {
         User user = userService.findByUserName(userName);
 
         JournalEntity saved = journalEntryRepository.save(entry);
         user.getJournalEntries().add(saved);
 
-        userService.saveEntry(user);
+        userService.saveUser(user);
     }
 
     public void saveEntry(JournalEntity entry) {
@@ -43,8 +42,9 @@ public class JournalEntryService {
 
     public void deleteEntry(String id, String userName){
         User user = userService.findByUserName(userName);
+        //System.out.println("id" + user.getId());
          user.getJournalEntries().removeIf(x -> x.getId().equals(id));
-         userService.saveEntry(user);
+         userService.saveUser(user);
         journalEntryRepository.deleteById(id);
 
     }
