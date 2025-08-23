@@ -1,34 +1,36 @@
 package net.sd.journalApp.config;
 
+import net.sd.journalApp.filter.JWTFilter;
 import net.sd.journalApp.service.UserDetialsImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-public class SpringSecurity  {
+public class SpringSecurity {
+
+    private final UserDetialsImp userDetialsImp;
+    private final JWTFilter jwtFilter;
 
     @Autowired
-    private final UserDetialsImp userDetialsImp;
-
-    public SpringSecurity(UserDetialsImp userDetialsImp) {
+    public SpringSecurity(UserDetialsImp userDetialsImp, JWTFilter jwtFilter) {
         this.userDetialsImp = userDetialsImp;
+        this.jwtFilter = jwtFilter;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -40,30 +42,28 @@ public class SpringSecurity  {
         return authProvider;
     }
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
+        http.csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // stateless for JWT
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/journal/**").authenticated()
-                        .requestMatchers("/user", "/user/**").permitAll()
+                        .requestMatchers("/user", "/user/**").permitAll() // allow registration/login
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-
                         .anyRequest().permitAll()
-                )
-                .formLogin(form -> form
-                        .permitAll() // allow everyone to see login page
-                )
-                .httpBasic(basic -> {}); // basic auth if needed
-        http.csrf(csrf -> csrf.disable());
+                );
+
+        // Add JWT filter before UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
 }
