@@ -5,10 +5,13 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import JournalDetails from "./pages/JournalDetails";
 import NotFound from "./pages/NotFound";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <Router>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />

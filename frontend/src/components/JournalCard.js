@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
-export default function JournalCard() {
+export default function JournalCard({title,content,id}) {
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    alert("Edit clicked");
-    navigate("/journal/1"); // SPA navigation
+   
+    navigate(`/journal/${id}`); // SPA navigation
   };
 
   return (
@@ -24,15 +24,16 @@ export default function JournalCard() {
           className="card-title fw-bold text-primary mb-2"
           style={{ fontSize: "1.3rem" }}
         >
-          Journal Title
+          
+          {title}
         </h5>
         <p
           className="card-text text-muted mb-3"
           style={{ fontSize: "1rem" }}
         >
-          A brief excerpt or summary of the journal entry...
+          {content}
         </p>
-        <div className="d-flex justify-content-between">
+        <div className="d-flex justify-content-between gap-5">
           <button
             className="btn btn-primary"
             style={{

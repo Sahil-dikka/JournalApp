@@ -1,12 +1,14 @@
 // src/components/Navbar.jsx
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
 
+  const navigate = useNavigate();
+  let userName = localStorage.getItem("userName") || "User";
   const handleLogout = () => {
-    alert("Logged out!");
-    window.location.href = "/";
-    // Add your logout logic here
+    
+    localStorage.removeItem("token");
+    navigate("/");
   }
 
   return (
@@ -19,7 +21,7 @@ export default function Navbar() {
 
         {/* Right-side options */}
         <div className="d-flex">
-          <p className="text-white mb-0 me-3 mt-1">Welcome, User!</p>
+          <p className="text-white mb-0 me-3 mt-1">Welcome, {userName}</p>
           <button className="btn btn-outline-light" onClick={handleLogout}>Logout</button>
         </div>
       </div>

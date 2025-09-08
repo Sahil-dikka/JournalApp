@@ -1,28 +1,54 @@
 import { useState } from "react";
 import RegisterImage from "../assets/registerImage.webp";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import usePost from "../Hooks/PostDetails";
+import ApiRoutes from "../ApiRoutes/ApiRoutes";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const { register, handleSubmit } = useForm();
+  const navigate = useNavigate();
+  const  registerEndpoint = ApiRoutes.POST.REGISTER
+  const{isLoading: registerLoading, mutate: fetchRegisterData} = usePost();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!username || !email || !password || !confirmPassword) {
-      setError("Please fill in all fields.");
+
+  const FormRegisterSubmit = (data) => {
+    console.log("Form data:", data);
+    if (!data?.userName || !data?.email || !data?.password || !data?.confirmPassword) {
+      toast.error("Please fill in all fields.");
       return;
     }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+    if (data?.password !== data?.confirmPassword) {
+      toast.error("Passwords do not match.");
       return;
     }
-    setError("");
-    alert(`Registered as ${username}`);
-    // Add your registration logic here
+
+    const registerRequestBody = {
+      userName: data?.userName,
+      password: data?.password,
+    }
+    fetchRegisterData(
+      {
+        endpoint: registerEndpoint,
+        formData: registerRequestBody
+
+      },
+      {
+        onSuccess: ({ data }) => {
+          toast.success("Registered successfully!");
+          navigate("/login");
+        },
+        onError: (error) => {
+          toast.error("Registration failed. Please try again.");
+        }
+      }
+    )
+
+
+    
   };
 
   return (
@@ -46,21 +72,18 @@ export default function Register() {
           <div className="w-100" style={{ maxWidth: "300px" }}>
             <h3 className="text-center mb-4">Register</h3>
 
-            {error && <div className="alert alert-danger py-2">{error}</div>}
-
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(FormRegisterSubmit)}>
               {/* Username */}
               <div className="form-floating mb-3">
                 <input
                   type="text"
                   className="form-control"
-                  id="username"
+                  id="userName"
                   placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
                   required
+                  {...register("userName")}
                 />
-                <label htmlFor="username">Username</label>
+                <label htmlFor="userName">Username</label>
               </div>
 
               {/* Email */}
@@ -70,9 +93,8 @@ export default function Register() {
                   className="form-control"
                   id="email"
                   placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   required
+                  {...register("email")}
                 />
                 <label htmlFor="email">Email</label>
               </div>
@@ -84,9 +106,8 @@ export default function Register() {
                   className="form-control"
                   id="password"
                   placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   required
+                  {...register("password")}
                 />
                 <label htmlFor="password">Password</label>
                 <span
@@ -111,9 +132,8 @@ export default function Register() {
                   className="form-control"
                   id="confirmPassword"
                   placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  {...register("confirmPassword")}
                 />
                 <label htmlFor="confirmPassword">Confirm Password</label>
                 <span
@@ -148,6 +168,5 @@ export default function Register() {
         </div>
       </div>
     </div>
-    
   );
 }

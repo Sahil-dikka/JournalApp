@@ -1,23 +1,53 @@
 import { useState } from "react";
 import Image from "../assets/frontImg.jpeg";
 import TextInput from "../components/common/TextInput";
+import usePost from "../Hooks/PostDetails";
+import { useForm } from "react-hook-form";
+import ApiRoutes from "../ApiRoutes/ApiRoutes"; // <-- fixed import
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { register, handleSubmit } = useForm(); // <-- get register
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!username || !password) {
-      setError("Please enter both username and password.");
+  const navigate = useNavigate()
+
+
+  const { isLoading: loginLoading, mutate: fetchLoginData } = usePost();
+
+  const LoginSubmit = (data) => {
+    console.log("form data",data);
+    if (!data?.userName || !data?.password) {
+      alert("Please enter both userName and password.");
       return;
     }
-    setError("");
-    alert(`Logged in as ${username}`);
-    window.location.href = "/dashboard";
-    // Add your authentication logic here
+    const requestBody = {
+      userName: data?.userName,
+      password: data?.password,
+    };
+    fetchLoginData(
+      {
+        endpoint: ApiRoutes.POST.LOGIN,
+        formData: requestBody,
+      },
+      {
+        onSuccess: ( data ) => {
+          toast.success("Login successful!");
+          console.log("response",data);
+          localStorage.setItem("token", data);
+          localStorage.setItem("userName", requestBody.userName);
+          navigate("/dashboard");
+        },
+        onError: (error) => {
+          toast.error("Login failed. Please check your credentials.");
+      }
+    }
+    );
   };
+
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
@@ -44,13 +74,12 @@ export default function Login() {
               <div className="alert alert-danger py-2">{error}</div>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(LoginSubmit)}>
               {/* Username */}
               <TextInput
-                label="Username"
+                label="userName"
                 id="username"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
+                {...register("userName")} // <-- register input
                 required
               />
 
@@ -60,8 +89,7 @@ export default function Login() {
                   label="Password"
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  {...register("password")} // <-- register input
                   required
                   style={{ paddingRight: "2.5rem" }}
                 />
@@ -74,7 +102,7 @@ export default function Login() {
                     top: "50%",
                     transform: "translateY(-50%)",
                     cursor: "pointer",
-                    color: "gray"
+                    color: "gray",
                   }}
                 >
                   {showPassword ? "🔓" : "🔒"}
@@ -98,5 +126,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-);
+  );
 }
