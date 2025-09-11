@@ -3,48 +3,91 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import usePost from "../Hooks/PostDetails";
 import ApiRoutes from "../ApiRoutes/ApiRoutes";
-
+import useGet from "../Hooks/GetDetails";
+import { useEffect } from "react";
+import usePut from "../Hooks/PutDetails";
 
 export default function JournalForm() {
 
   const navigate = useNavigate();
   
   const {id} = useParams();
-  const {handleSubmit,register,reset} = useForm();
+  const {handleSubmit,register,reset,setValue} = useForm();
 
   const {isLoading: createJournalLoading, mutate: createJournal} = usePost();
+  const {isLoading: updateJournalLoading, mutate: updateJournal} = usePut();
 
+  const journalEndpoint = ApiRoutes.GET.GET_JOURNAL_BY_ID.replace("id", `id/${id}`);
+  const {isLoading: journalIdLoading,data:journalViewData , refetch: getJournalById} = useGet(journalEndpoint,{enabled: false});
+
+  console.log("jjjjjjjjjjj",id,journalViewData);
   
   const JournalFormSubmit = (data) => {
-    console.log(data)
+    console.log("DDDDDD",data)
     let createJournalRequestBody = {
       title: data?.title,
       content: data?.content
   }
-  createJournal(
-    {
-      endpoint: ApiRoutes.POST.CREATE_NEW_JOURNAL,
-      formData: createJournalRequestBody
-    },
-    {
-      onSuccess: (data) => {
-        console.log("Journal created successfully:", data);
-        reset();
-        navigate("/dashboard");
+
+  if(id === "new"){
+    
+    createJournal(
+      {
+        endpoint: ApiRoutes.POST.CREATE_NEW_JOURNAL ,
+        formData: createJournalRequestBody
       },
-      onError: (error) => {
-        console.error("Error creating journal:", error);
+      {
+        onSuccess: (data) => {
+          console.log("Journal created successfully:", data);
+          reset();
+          navigate("/dashboard");
+        },
+        onError: (error) => {
+          console.error("Error creating journal:", error);
+        }
       }
-    }
-  );
+    );
+  } else{
+    updateJournal(
+      {
+        endpoint: ApiRoutes.PUT.UPDATE_JOURNAL.replace("id", `id/${id}`),
+        formData: createJournalRequestBody
+      },
+      {
+        onSuccess: (data) => {
+          console.log("Journal updated successfully:", data);
+          reset();
+          navigate("/dashboard");
+        },
+        onError: (error) => {
+          console.error("Error updating journal:", error);
+        }
+      }
+    )
   }
+
+  }
+
+  useEffect(() => {
+  if (id !== "new") {
+    getJournalById();
+  }
+}, [id, getJournalById]);
+
+useEffect(() => {
+  if (journalViewData) {
+    setValue("title", journalViewData.title);
+    setValue("content", journalViewData.content);
+  }
+}, [journalViewData, setValue]);
+
   return (
     <div className="card shadow mx-auto mt-5" style={{ maxWidth: "500px", borderRadius: "18px" }}>
       <div className="card-body p-4">
         <h2 className="fw-bold text-primary mb-4 text-center">Journal Entry</h2>
         <form onSubmit={handleSubmit(JournalFormSubmit)}>
           <div className="mb-3">
-            <label className="form-label fw-semibold" htmlFor="journal-title">Title</label>
+            <label className="form-label fw-semibold" htmlFor="journal-title"> Journal Title</label>
             <input
               type="text"
               className="form-control"
@@ -52,10 +95,11 @@ export default function JournalForm() {
               placeholder="Enter journal title"
               style={{ borderRadius: "10px" }}
               {...register("title")}
+              
             />
           </div>
           <div className="mb-4">
-            <label className="form-label fw-semibold" htmlFor="journal-content">Content</label>
+            <label className="form-label fw-semibold" htmlFor="journal-content">Journal Content</label>
             <textarea
               className="form-control"
               id="journal-content"
@@ -63,6 +107,7 @@ export default function JournalForm() {
               placeholder="Write your journal content here"
               style={{ borderRadius: "10px", resize: "vertical" }}
               {...register("content")}
+              
             />
           </div>
 

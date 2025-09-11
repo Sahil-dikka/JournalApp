@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
-export default function JournalCard({title,content,id}) {
+export default function JournalCard({ title, content, id }) {
   const navigate = useNavigate();
 
   const handleEdit = () => {
-   
-    navigate(`/journal/${id}`); // SPA navigation
+    navigate(`/journal/${id}`);
   };
 
   return (
@@ -13,27 +12,36 @@ export default function JournalCard({title,content,id}) {
       className="card m-3 shadow-sm"
       style={{
         borderRadius: "18px",
-        background:
-          "linear-gradient(135deg, #ece1f7ff 0%, #dde4ebff 100%)",
+        background: "linear-gradient(135deg, #ece1f7ff 0%, #dde4ebff 100%)",
         border: "none",
-        maxWidth: "340px",
+        width: "340px",       // fixed width
+        height: "200px",      // fixed height (adjust as needed)
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between", // keeps buttons aligned at bottom
       }}
     >
-      <div className="card-body" style={{ padding: "1.5rem" }}>
+      <div className="card-body d-flex flex-column" style={{ padding: "1.5rem" }}>
         <h5
           className="card-title fw-bold text-primary mb-2"
           style={{ fontSize: "1.3rem" }}
         >
-          
           {title}
         </h5>
         <p
-          className="card-text text-muted mb-3"
-          style={{ fontSize: "1rem" }}
+          className="card-text text-muted mb-3 flex-grow-1"
+          style={{
+            fontSize: "1rem",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 3, // show only 3 lines
+            WebkitBoxOrient: "vertical",
+          }}
         >
-          {content}
+          {content ? content.split(" ").slice(0, 10).join(" ") + "..." : " "}
         </p>
-        <div className="d-flex justify-content-between gap-5">
+        <div className="d-flex justify-content-between gap-5 mt-auto">
           <button
             className="btn btn-primary"
             style={{
