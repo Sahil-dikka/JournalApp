@@ -45,18 +45,19 @@ public class SpringSecurity {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+        http.csrf(csrf -> csrf.disable())
+                .cors(cors -> {}) // 👈 enable CORS
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // stateless for JWT
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // 👈 preflight
+                        .requestMatchers("/public/**").permitAll() // login/signup
                         .requestMatchers("/journal/**").authenticated()
-                        .requestMatchers("/user", "/user/**").permitAll() // allow registration/login
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 );
 
-        // Add JWT filter before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

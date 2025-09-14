@@ -15,7 +15,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/journal")
-
+@CrossOrigin(origins = "http://localhost:3000")
 public class JournalController {
 
 
@@ -85,7 +85,7 @@ public class JournalController {
         String userName = authentication.getName();
 
         journalEntryService.deleteEntry(myid,userName);
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
