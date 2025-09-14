@@ -13,7 +13,9 @@ const ApiRoutes = {
         UPDATE_JOURNAL : "/journal/id"
     },
 
-    DELETE : {}
+    DELETE : {
+        DELETE_JOURNAL : "/journal/id"
+    }
 };
 
 export default ApiRoutes;

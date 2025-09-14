@@ -1,11 +1,20 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ModalScreen from "./common/ModalScreen";
 
-export default function JournalCard({ title, content, id }) {
+export default function JournalCard({ title, content, id, isModalOpen, setIsModalOpen, onDeleteClick }) {
+
+  
+
   const navigate = useNavigate();
 
   const handleEdit = () => {
     navigate(`/journal/${id}`);
   };
+  
+  const handleDelete = () => {
+    onDeleteClick()
+  }
 
   return (
     <div
@@ -60,11 +69,14 @@ export default function JournalCard({ title, content, id }) {
               fontWeight: 500,
               padding: "0.4rem 1.2rem",
             }}
+            onClick={handleDelete}
           >
             Delete
           </button>
         </div>
       </div>
-    </div>
+    
+      
+      </div>
   );
 }
