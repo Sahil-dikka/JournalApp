@@ -39,7 +39,7 @@ export default function Register() {
       {
         onSuccess: ({ data }) => {
           toast.success("Registered successfully!");
-          navigate("/login");
+          navigate("/");
         },
         onError: (error) => {
           toast.error("Registration failed. Please try again.");
