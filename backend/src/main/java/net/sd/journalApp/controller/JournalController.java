@@ -15,7 +15,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/journal")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class JournalController {
 
 
