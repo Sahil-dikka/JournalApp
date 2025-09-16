@@ -6,6 +6,7 @@ import ApiRoutes from "../ApiRoutes/ApiRoutes";
 import useGet from "../Hooks/GetDetails";
 import { useEffect } from "react";
 import usePut from "../Hooks/PutDetails";
+import Loader from "./common/Loader";
 
 export default function JournalForm() {
 
@@ -122,6 +123,7 @@ useEffect(() => {
           </div>
         </form>
       </div>
+      {(createJournalLoading || updateJournalLoading || journalIdLoading) && (<Loader text={"Loading..."}/>)}
     </div>
   );
 }

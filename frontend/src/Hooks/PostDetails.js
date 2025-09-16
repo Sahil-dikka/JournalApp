@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080", // change this to your backend
+  baseURL: "https://journal-backend-m4in.onrender.com", // change this to your backend
 });
 
 api.interceptors.request.use((config) => {

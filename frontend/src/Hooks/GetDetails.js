@@ -4,7 +4,7 @@ import axios from "axios";
 
 // Create a reusable axios instance
 const api = axios.create({
-  baseURL: "http://localhost:8080", // change to your backend
+  baseURL: "https://journal-backend-m4in.onrender.com", // change to your backend
 });
 
 // Add interceptor to attach JWT
